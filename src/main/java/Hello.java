@@ -1,5 +1,4 @@
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
+import com.opencsv.*;
 
 import java.io.FileWriter;
 import java.io.Reader;
@@ -14,8 +13,8 @@ public class Hello {
 
 
     public static void main(String[] args) throws Exception {
-        String[] hello=new String[]{"Hello","World"};
-        String[] erstens=new String[]{"erstens","zweitens"};
+        String[] hello=new String[]{"    Hello      2","World"};
+        String[] erstens=new String[]{"erstens","    zweitens"};
         List<String[]> stringArray = Arrays.stream(new String[][]{hello,erstens}).toList();
         csvWriterAll(stringArray, Path.of("./twoColumn.csv"));
         Reader reader = Files.newBufferedReader(Path.of("./twoColumn.csv"));
@@ -24,20 +23,29 @@ public class Hello {
              ) {
             for (String s:text
                  ) {
-                System.out.print(s+" ");
+                System.out.print(s+";");
             }
             System.out.println();
         }
         //System.out.println(resualt.toArray().);
     }
 
+    public static String[] removeLeadingBlank(String[] s){
+        for (int i=0;i<s.length;i++) {
+            s[i]=s[i].stripLeading();
+        }
+
+        return s;
+    }
+
 
     public static List<String[]> oneByOne(Reader reader) throws Exception {
         List<String[]> list = new ArrayList<>();
-        CSVReader csvReader = new CSVReader(reader);
+        CSVParser parser = new CSVParserBuilder().withSeparator(',').build();
+        CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build();
         String[] line;
         while ((line = csvReader.readNext()) != null) {
-            list.add(line);
+            list.add(removeLeadingBlank(line));
         }
         reader.close();
         csvReader.close();
